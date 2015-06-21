@@ -359,13 +359,33 @@
 				});
 
 				var handle = $element;
-				handle.on('mousedown touchstart', onMousedown);
+
+				var startTimer;
+				var clearEvent = function () {
+			    clearTimeout(startTimer);
+			  };
+
+				var opts = $parse($attrs.svElement)($scope);
+				opts = angular.extend({}, {
+				  delay: 0
+				}, opts);
+
+				var event = onMousedown;
+				if (opts.delay) {
+				  event = function (e) {
+				    html.on('mouseup touchend', clearEvent);
+				    startTimer = setTimeout(function () { onMousedown(e); }, opts.delay);
+				  };
+				}
+
+				handle.on('mousedown touchstart', event);
 				$scope.$watch('$ctrl.handle', function(customHandle){
-					if(customHandle){
-						handle.off('mousedown touchstart', onMousedown);
-						handle = customHandle;
-						handle.on('mousedown touchstart', onMousedown);
-					}
+				  if (customHandle) {
+				    clearEvent();
+					  handle.off('mousedown touchstart', event);
+					  handle = customHandle;
+					  handle.on('mousedown touchstart', event);
+          }
 				});
 
 				var helper;
