@@ -374,7 +374,10 @@
 				if (opts.delay) {
 				  event = function (e) {
 				    html.on('mouseup touchend', clearEvent);
-				    startTimer = setTimeout(function () { onMousedown(e); }, opts.delay);
+				    startTimer = setTimeout(function () {
+				      html.off('mouseup touchend');
+				      onMousedown(e);
+				    }, opts.delay);
 				  };
 				}
 
